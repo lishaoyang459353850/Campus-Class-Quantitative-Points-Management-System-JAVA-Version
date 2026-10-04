@@ -1,0 +1,104 @@
+# ==========================================================================
+# 校园班级量化积分管理系统 —— 一键部署编排（MySQL 8 + Redis + 应用）
+# 使用方式：把本文件、Dockerfile、target/school-points.jar 放在同一目录，
+#          修改下面的密码与 SMTP / hCaptcha 配置后执行 docker compose up -d
+# 说明：敏感项全部通过环境变量注入，不要把真实密码提交到 Git。
+# ==========================================================================
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: school-points-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ChangeMe_Root_123
+      MYSQL_DATABASE: school_points
+      MYSQL_USER: school
+      MYSQL_PASSWORD: ChangeMe_School_123
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --default-authentication-plugin=mysql_native_password
+      - --lower_case_table_names=1
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      # 首次启动自动执行建表脚本（已存在同名库表时不会重复执行）
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pChangeMe_Root_123"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: school-points-redis
+    restart: always
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: school-points:1.0.0
+    container_name: school-points-app
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_PORT: 8080
+      # ---------------- 数据库 ----------------
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: school_points
+      DB_USERNAME: school
+      DB_PASSWORD: ChangeMe_School_123
+      # ---------------- Redis ----------------
+      REDIS_ENABLED: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # ---------------- 自建 SMTP（必须换成你自己的邮箱服务器） ----------------
+      MAIL_ENABLED: "true"
+      MAIL_HOST: smtp.your-school.edu.cn
+      MAIL_PORT: "465"
+      MAIL_USERNAME: noreply@your-school.edu.cn
+      MAIL_PASSWORD: your-smtp-password
+      MAIL_FROM: noreply@your-school.edu.cn
+      MAIL_FROM_NAME: 校园班级量化积分管理系统
+      MAIL_SSL_ENABLE: "true"
+      MAIL_STARTTLS_ENABLE: "false"
+      SCHOOL_NAME: 示范中学
+      # ---------------- hCaptcha（secret 只放后端） ----------------
+      HCAPTCHA_ENABLED: "true"
+      HCAPTCHA_SITE_KEY: your-hcaptcha-site-key
+      HCAPTCHA_SECRET_KEY: your-hcaptcha-secret-key
+      # ---------------- JWT 密钥（生产必须替换为随机串） ----------------
+      JWT_SECRET: please-change-this-to-a-random-secret-string-at-least-32-bytes
+      # ---------------- 其他 ----------------
+      LOG_LEVEL: INFO
+      LOG_PATH: /app/logs
+      UPLOAD_MAX_FILE_SIZE: 10MB
+      CORS_ALLOWED_ORIGINS: http://localhost:8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/app/logs
+      - ./data/upload:/app/data/upload
+
+# 说明：不使用外部网络，三个服务在同一默认桥接网络内通过服务名互相访问。
