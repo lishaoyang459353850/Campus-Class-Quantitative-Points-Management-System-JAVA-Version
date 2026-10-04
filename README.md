@@ -1,12 +1,12 @@
 #校园班级量化积分管理系统（Campus Class Quantitative Points Management System - JAVA Version）-CCQPMS-JE
 
-一套可直接部署运行的中小学班级量化积分管理系统，覆盖「管理员 — 教师 — 学生」三种角色，
+**一套可直接部署运行的中小学班级量化积分管理系统，覆盖「管理员 — 教师 — 学生」三种角色，
 实现量化分类维护、积分录入与审核、班级与学生排名、学生申诉、公告发布、Excel 批量导入导出、
 操作日志留痕等完整闭环。
 后端：Spring Boot 3.2.5 + Java 17 + MyBatis-Plus 3.5.7 + MySQL 8 + Redis（可选）
 安全：Spring Security + JWT + BCrypt 密码加密 + hCaptcha 人机校验 + 自建 SMTP 邮件验证码
 前端：原生 HTML / CSS / JavaScript（无框架、无构建步骤），ECharts 图表本地化，离线可用
-打包产物：target/school-points.jar（内嵌 Tomcat，前端页面与静态资源全部打进 jar）
+打包产物：target/school-points.jar（内嵌 Tomcat，前端页面与静态资源全部打进 jar）**
 
 ---
 一、功能清单
