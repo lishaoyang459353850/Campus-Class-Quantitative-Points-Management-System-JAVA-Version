@@ -1,0 +1,37 @@
+# ==========================================================================
+# Git 属性配置：统一换行符、避免中文乱码、标记二进制文件
+# ==========================================================================
+
+# 默认按文本处理，仓库内统一使用 LF 换行
+* text=auto eol=lf
+
+# Java / 配置 / 前端源码按文本处理
+*.java    text eol=lf
+*.xml     text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.properties text eol=lf
+*.sql     text eol=lf
+*.md      text eol=lf
+*.html    text eol=lf
+*.css     text eol=lf
+*.js      text eol=lf
+
+# 二进制文件不做换行符转换
+*.jar     binary
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.xls     binary
+*.xlsx    binary
+*.pdf     binary
+*.zip     binary
+*.woff    binary
+*.woff2   binary
+*.ttf     binary
+
+# 语言统计：前端静态页面与 SQL 脚本正常参与统计
+*.html    linguist-language=HTML
+*.sql     linguist-language=SQL
