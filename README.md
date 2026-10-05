@@ -1,4 +1,5 @@
-# 校园班级量化积分管理系统
+### 校园班级量化积分管理系统
+**长期停止更新与支持，中国用户请访问[gitee仓库](https://gitee.com/LSYteams/Campus-Class-Quantitative-Points-Management-System-JAVA-Version)获取支持
 
 一套可直接部署运行的中小学班级量化积分管理系统，覆盖「管理员 — 教师 — 学生」三种角色，
 实现量化分类维护、积分录入与审核、班级与学生排名、学生申诉、公告发布、Excel 批量导入导出、
